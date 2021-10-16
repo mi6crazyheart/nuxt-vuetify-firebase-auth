@@ -1,17 +1,11 @@
+
 const actions = {
     async onAuthStateChangedAction(state, { authUser, claims }) {
         console.log('onAuthStateChangedAction - authUser', authUser);
-        if (!authUser) {
-            // remove state
-            state.commit('SET_USER', null)
 
-            //redirect from here
-            this.$router.push({
-                // path: '/auth/signin',
-                path: '/',
-            })
+        if (!authUser) {
+            state.commit('SET_USER', null)
         } else {
-            // console.log('authUser', authUser);
             const { uid, email } = authUser
             state.commit('SET_USER', {
                 uid,
@@ -20,7 +14,6 @@ const actions = {
         }
     },
 
-    // Store action called nuxtServerInit:
     async nuxtServerInit({ dispatch, commit }, { res }) {
         if (res && res.locals && res.locals.user) {
             const { allClaims: claims, idToken: token, ...authUser } = res.locals.user
@@ -32,9 +25,6 @@ const actions = {
                 claims,
                 token
             });
-        } else {
-            // console.log('nuxtServerInit - res', res);
-            // console.log('nuxtServerInit - req', req);
         }
     }
 }

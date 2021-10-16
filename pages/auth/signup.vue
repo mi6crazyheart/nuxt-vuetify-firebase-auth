@@ -3,6 +3,15 @@
     <v-col cols="12" sm="8" md="4">
       <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="">
         <v-text-field
+          v-model="name"
+          :rules="nameRules"
+          type="text"
+          label="Name"
+          autocomplete="name"
+          required
+        ></v-text-field>
+
+        <v-text-field
           v-model="email"
           :rules="emailRules"
           type="email"
@@ -20,12 +29,13 @@
           required
         ></v-text-field>
 
-        <v-btn :disabled="!valid" color="success" class="mr-4" @click="login">
-          Login
-        </v-btn>
-
-        <v-btn color="success" class="mr-4" @click="forgetPassword">
-          Forget Password
+        <v-btn
+          :disabled="!valid"
+          color="success"
+          class="mr-4"
+          @click="createAccount"
+        >
+          Create Account
         </v-btn>
       </v-form>
 
@@ -44,7 +54,7 @@ export default {
     name: "",
     nameRules: [
       (v) => !!v || "Name is required",
-      (v) => (v && v.length <= 10) || "Name must be less than 10 characters",
+      (v) => (v && v.length <= 30) || "Name must be less than 10 characters",
     ],
     password: "",
     passwordRules: [
@@ -61,13 +71,40 @@ export default {
   }),
 
   methods: {
-    login() {
+    createAccount() {
       let formValidation = this.$refs.form.validate();
 
       if (formValidation) {
         this.$fire.auth
-          .signInWithEmailAndPassword(this.email, this.password)
+          .createUserWithEmailAndPassword(this.email, this.password)
           .then((userCredential) => {
+            this.$fire.auth.currentUser
+              .sendEmailVerification()
+              .then(() => {
+                // Email verification sent!
+                // ...
+              })
+              .catch((error) => {
+                console.log(
+                  "Caught error in sending email verification link to user",
+                  error
+                );
+              });
+
+            const currentUser = this.$fire.auth.currentUser;
+            currentUser
+              .updateProfile({
+                displayName: this.name,
+                // photoURL: "https://example.com/jane-q-user/profile.jpg",
+              })
+              .then(() => {
+                // Update successful
+                // ...
+              })
+              .catch((error) => {
+                console.log("update user profile error", error);
+              });
+
             const authUser = {
               uid: userCredential.user.uid,
               email: userCredential.user.email,
@@ -77,22 +114,18 @@ export default {
                 authUser,
               })
               .then(() => {
-                this.$router.replace("/profile");
+                this.$router.replace("/member/desk");
               })
               .catch((error) => {
                 console.log("User State error", error);
               });
           })
           .catch((error) => {
-            console.log("Login error", error);
+            console.log("Signup error", error);
             this.snackbar = true;
             this.errorMessage = error.message;
           });
       }
-    },
-    forgetPassword() {
-      console.log("clicked on forget password");
-      this.$router.push("/auth/resetpassword");
     },
   },
 };

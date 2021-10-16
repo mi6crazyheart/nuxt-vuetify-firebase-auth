@@ -23,6 +23,7 @@ export default {
   methods: {
     async logout() {
       await this.$fire.auth.signOut();
+      this.$router.replace("/");
     },
   },
 };

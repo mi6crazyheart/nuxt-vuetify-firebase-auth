@@ -24,7 +24,7 @@ $ npm run start
 $ npm run generate
 ```
 
-For detailed explanation on how things work, check out the [documentation](https://nuxtjs.org).
+For detailed explanation on how things work, check out the [documentation](https://byteblocks.hashnode.dev/a-user-authentication-system-with-nuxt-js-and-firebase-auth).
 
 ## Special Directories
 
